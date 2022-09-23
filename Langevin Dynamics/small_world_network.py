@@ -23,7 +23,7 @@ class smallWorldNetwork():
 
     def ring(N: int) -> array:
         """
-        generates the adjacey matrix of the ring
+        Generates the adjacey matrix of the ring
 
         Args:
             N (int): Number of XY spins in the network
@@ -42,7 +42,7 @@ class smallWorldNetwork():
 
     def finite(N: int, c: float) -> array:
         """
-       generates the adjacey matrix of the finite connectivity graph 
+       Generates the adjacey matrix of the finite connectivity graph 
 
         Args:
             N (int): Number of XY spins in the network
@@ -56,7 +56,13 @@ class smallWorldNetwork():
         A_symm = (A_symm < c/(N-1)).astype(int)
         return A_symm - diag(diag(A_symm))
 
-    def force(self):
+    def force(self) -> array:
+        """
+        Computes the force vector for the current state of the system
+
+        Returns:
+            array: _description_
+        """
         ss = sin(subtract.outer(self.spins, self.spins))
         return (self.J0*sum(self.ring*ss, axis=1) +
                 self.J*sum(self.finite*ss, axis=1))
