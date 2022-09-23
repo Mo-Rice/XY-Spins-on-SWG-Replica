@@ -2,7 +2,7 @@ from numpy import array, pi, diag, zeros, sum, sin, subtract
 from numpy.random import rand, randn
 
 
-class smallWorldNetwork():
+class SmallWorldNetwork():
 
     def __init__(self, N: int, c: float, J: float, J0: int = 1):
         """
@@ -23,13 +23,13 @@ class smallWorldNetwork():
 
     def ring(N: int) -> array:
         """
-        Generates the adjacey matrix of the ring
+        Generates the adjacency matrix of the ring
 
         Args:
             N (int): Number of XY spins in the network
 
         Returns:
-            array: Ring adjaceny matrix
+            array: Ring adjacency matrix
         """
         A = zeros((N, N))
         pos = 0
@@ -42,14 +42,14 @@ class smallWorldNetwork():
 
     def finite(N: int, c: float) -> array:
         """
-       Generates the adjacey matrix of the finite connectivity graph 
+       Generates the adjacency matrix of the finite connectivity graph
 
         Args:
             N (int): Number of XY spins in the network
             c (float): Average connectivity
 
         Returns:
-            array: Finite connectivity graph adjaceny matrix
+            array: Finite connectivity graph adjacency matrix
         """
         A = rand(N, N)
         A_symm = (A + A.T)/2
