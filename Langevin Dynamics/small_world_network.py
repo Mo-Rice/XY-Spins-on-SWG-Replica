@@ -2,7 +2,7 @@ from numpy import array, pi, diag, zeros, sum, sin, subtract
 from numpy.random import rand, randn
 
 
-class SmallWorldNetwork():
+class smallWorldNetwork():
 
     def __init__(self, N: int, c: float, J: float, J0: int = 1):
         """
@@ -14,14 +14,14 @@ class SmallWorldNetwork():
             c (float): Connectivity of the underlying finite graph
         """
         self.N = N
-        self.ring = self.ring(self.N)
-        self.finite = self.finite(self.N)
-        self.spins = randn(N)*(2*pi)
         self.J0 = J0
         self.J = J
         self.c = c
+        self.spins = randn(N)*(2*pi)
+        self.finite = self.finite(self.N, self.c)
+        self.ring = self.ring(self.N)
 
-    def ring(N: int) -> array:
+    def ring(self, N: int) -> array:
         """
         Generates the adjacency matrix of the ring
 
@@ -40,7 +40,7 @@ class SmallWorldNetwork():
             pos += 1
         return A.astype(int)
 
-    def finite(N: int, c: float) -> array:
+    def finite(self, N: int, c: float) -> array:
         """
        Generates the adjacency matrix of the finite connectivity graph
 
@@ -51,7 +51,7 @@ class SmallWorldNetwork():
         Returns:
             array: Finite connectivity graph adjacency matrix
         """
-        A = rand(N, N)
+        A = rand( N, N)
         A_symm = (A + A.T)/2
         A_symm = (A_symm < c/(N-1)).astype(int)
         return A_symm - diag(diag(A_symm))
