@@ -1,10 +1,10 @@
-from numpy import array, pi, diag, zeros, sum, sin, subtract
-from numpy.random import rand, randn
+from numpy import array, pi, diag, zeros, sum, sin, add, subtract, multiply
+from numpy.random import rand, uniform
 
 
 class smallWorldNetwork():
 
-    def __init__(self, N: int, c: float, J: float, J0: int = 1):
+    def __init__(self, N: int, c: float, J: float, J0: float = 1.0):
         """
         Initializes a small world network class for use in a Langevin
         simulation
@@ -17,7 +17,7 @@ class smallWorldNetwork():
         self.J0 = J0
         self.J = J
         self.c = c
-        self.spins = randn(N)*(2*pi)
+        self.spins = uniform(-1,1,self.N)*pi
         self.finite = self.finite(self.N, self.c)
         self.ring = self.ring(self.N)
 
@@ -56,13 +56,15 @@ class smallWorldNetwork():
         A_symm = (A_symm < c/(N-1)).astype(int)
         return A_symm - diag(diag(A_symm))
 
-    def force(self) -> array:
+    def force(self, spins: array) -> array:
         """
         Computes the force vector for the current state of the system
 
         Returns:
             array: _description_
         """
-        ss = sin(subtract.outer(self.spins, self.spins))
-        return (self.J0*sum(self.ring*ss, axis=1) +
-                self.J*sum(self.finite*ss, axis=1))
+        s_outer = subtract.outer(spins, spins)
+        s_ring = s_outer * self.ring
+        s_finite = s_outer * self.finite
+        f = add(self.J0 * sum(sin(s_ring), axis=0), self.J * sum(sin(s_finite), axis=0))
+        return f
