@@ -4,6 +4,7 @@ from numba import jit
 from numpy.random import default_rng
 from small_world_network import smallWorldNetwork
 from tqdm import tqdm
+import pandas as pd
 
 
 class langevinDynamics():
@@ -49,3 +50,11 @@ class langevinDynamics():
                 self.state_update(s_i)
 
             self.samples[:, i] = self.current_state
+
+    def save(self, filename: str, header=True) -> None:
+        df = pd.DataFrame(self.samples)
+        if header:
+            with open(filename, 'w') as file:
+                file.writelines(f'Simulation settings: \n N = {self.N} \n c = {self.SWN.c} \n n = {self.n} \n T = {self.T} \n dt = {self.dt} \n b = {self.b_n}\n')
+
+        df.to_csv(filename, mode="a", header=False, index=False)
