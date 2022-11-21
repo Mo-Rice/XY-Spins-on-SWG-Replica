@@ -1,9 +1,9 @@
-from numpy import array, pi, diag, zeros, sum, sin, add, subtract, multiply
+from numpy import array, pi, diag, zeros, sum, sin, add, subtract, multiply, triu
 from numpy.random import rand, uniform
 
 
-class smallWorldNetwork():
 
+class smallWorldNetwork():
     def __init__(self, N: int, c: float, J: float, J0: float = 1.0):
         """
         Initializes a small world network class for use in a Langevin
@@ -18,8 +18,8 @@ class smallWorldNetwork():
         self.J = J
         self.c = c
         self.spins = uniform(-1,1,self.N)*pi
-        self.finite = self.finite(self.N, self.c)
-        self.ring = self.ring(self.N)
+        self.A_f = self.finite(self.N, self.c)
+        self.A_r = self.ring(self.N)
 
     def ring(self, N: int) -> array:
         """
@@ -51,10 +51,10 @@ class smallWorldNetwork():
         Returns:
             array: Finite connectivity graph adjacency matrix
         """
-        A = rand( N, N)
-        A_symm = (A + A.T)/2
-        A_symm = (A_symm < c/(N-1)).astype(int)
-        return A_symm - diag(diag(A_symm))
+        A = uniform( 0, 1, size=(N, N))
+        A_mask = triu((A < c/N).astype(int), k=1)
+        A_symm = (A_mask + A_mask.T) / 2
+        return A_symm
 
     def force(self, spins: array) -> array:
         """
@@ -64,7 +64,7 @@ class smallWorldNetwork():
             array: _description_
         """
         s_outer = subtract.outer(spins, spins)
-        s_ring = s_outer * self.ring
-        s_finite = s_outer * self.finite
+        s_ring = s_outer * self.A_r
+        s_finite = s_outer * self.A_f
         f = add(self.J0 * sum(sin(s_ring), axis=0), self.J * sum(sin(s_finite), axis=0))
         return f
