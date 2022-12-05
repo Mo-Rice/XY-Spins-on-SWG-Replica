@@ -335,3 +335,10 @@ cython_debug/
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,python,pycharm,visualstudiocode 
+Langevin Dynamics/pypy_test.ipynb
+Langevin Dynamics/test.ipynb
+Langevin Dynamics/profile.html
+Langevin Dynamics/profile.json
+.gitignore
+.idea/other.xml
+.gitignore

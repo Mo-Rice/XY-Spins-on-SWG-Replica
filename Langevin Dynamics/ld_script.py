@@ -1,13 +1,13 @@
 import numpy as np
 import numba as nb
-import matplotlib.pyplot as plt
-from numpy import zeros, sum, sqrt
-from numpy.random import normal
+#import matplotlib.pyplot as plt
+from numpy import zeros, sum, sqrt, sin, cos, ndarray, mean, power, multiply, roll, triu
+from numpy.random import normal, uniform
 from tqdm import tqdm
 
 
 # Helper Functions
-def finite(N: int, c: float) -> np.ndarray:
+def finite(N: int, c: float) -> ndarray:
     """
     Generates the adjacency matrix of the finite connectivity graph
 
@@ -18,13 +18,13 @@ def finite(N: int, c: float) -> np.ndarray:
     Returns:
         array: Finite connectivity graph adjacency matrix
     """
-    A = np.random.uniform(0, 1, size=(N, N))
-    A_mask = np.triu((A < c/N).astype(int), k=1)
+    A = uniform(0, 1, size=(N, N))
+    A_mask = triu((A < c/N).astype(int), k=1)
     A_symm = (A_mask + A_mask.T) 
     return A_symm
 
 
-def ring(N: int) -> np.ndarray:
+def ring(N: int) -> ndarray:
     """
     Generates the adjacency matrix of the ring
 
@@ -43,27 +43,45 @@ def ring(N: int) -> np.ndarray:
         pos += 1
     return A.astype(int)
 
-def get_statistics(samples: np.ndarray):
-    x = np.cos(samples)
-    y = np.sin(samples)
+def get_statistics(samples: ndarray):
+    x = cos(samples)
+    y = sin(samples)
     m_x = x.mean()
     m_y = y.mean()
-    m = np.sqrt(m_x ** 2 + m_y ** 2)
-    q_xx = np.mean(np.power(x.mean(axis=1), 2))
-    q_yy = np.mean(np.power(y.mean(axis=1), 2))
+    m = sqrt(m_x ** 2 + m_y ** 2)
+    q_xx = mean(power(x.mean(axis=1), 2))
+    q_yy = mean(power(y.mean(axis=1), 2))
     q = q_xx + q_yy
-    c_x = np.mean(np.multiply(x, np.roll(x, 1)))
-    c_y = np.mean(np.multiply(y, np.roll(y, 1)))
+    c_x = mean(multiply(x, roll(x, 1)))
+    c_y = mean(multiply(y, roll(y, 1)))
 
     return m_x, m_y, m, q_xx, q_yy, q, c_x, c_y
 
 @nb.njit(parallel=True, cache=True)
+# def loop(s: ndarray, n: int, A_r: ndarray, A_f: ndarray, J: float, J0: float, T:float, dt: float) -> ndarray:
+#     M = A_r.shape[0]
+    
+#     for i in range(n):
+#         t = zeros((M,M))
+        
+#         for j in range(M):
+#             for k in range(M):
+#                 t[j, k] = s[i] - s[j]
+                
+#         t = sin(t)
+#         f = J*sum(t*A_f, axis=1) + J0*sum(t*A_r, axis=1)
+#         s += (normal(size=s.size)* sqrt(2 * T * dt) - f*dt)
+        
+#     return s 
+    
+#define a singular loop 
+
 def force(spins: np.ndarray, A_r: np.ndarray, A_f: np.ndarray, J: float, J0: float) -> np.ndarray:
     t = zeros((N,N))
     for i in range(N):
         for j in range(N):
             t[i, j] = spins[i] - spins[j]
-    t = np.sin(t)
+    t = sin(t)
     return J*sum(t*A_f, axis=1) + J0*sum(t*A_r, axis=1)
 
 def loop(s: np.ndarray, n: int, A_r: np.ndarray, A_f: np.ndarray, J: float, J0: float, T:float, dt: float) -> np.ndarray:
@@ -99,5 +117,3 @@ for i in tqdm(range(n), desc="Sampling"):
     s_n[i+1, :] = loop(s_n[i, :], n_s, A_r, A_f, J, J0, T, dt) 
 
 m_x, m_y, m, q_xx, q_yy, q, c_x, c_y = get_statistics(s_n)
-
-print('blah')
